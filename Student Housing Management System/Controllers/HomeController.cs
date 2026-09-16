@@ -1,32 +1,24 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Student_Housing_Management_System.Models;
+using Student_Housing_Management_System.Repositories;
 
 namespace Student_Housing_Management_System.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly StudentRepository _studentRepository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(StudentRepository studentRepository)
         {
-            _logger = logger;
+            _studentRepository = studentRepository;
         }
 
         public IActionResult Index()
         {
-            return View();
-        }
+            var students = _studentRepository.GetAll();
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+            ViewBag.Students = students;
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View();
         }
     }
-}
+}   

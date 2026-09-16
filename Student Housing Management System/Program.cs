@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Student_Housing_Management_System.Data;
+using Student_Housing_Management_System.Repositories;
 
 namespace Student_Housing_Management_System
 {
@@ -15,6 +16,8 @@ namespace Student_Housing_Management_System
             builder.Services.AddDbContext<StudentHousingDbContext>(options =>
                 options.UseSqlServer(
                     builder.Configuration.GetConnectionString("StudentHousingDatabase")));
+            
+            builder.Services.AddScoped<StudentRepository>();
 
             var app = builder.Build();
 
