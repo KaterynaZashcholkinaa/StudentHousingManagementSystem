@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using Student_Housing_Management_System.Data;
+
 namespace Student_Housing_Management_System
 {
     public class Program
@@ -8,6 +11,10 @@ namespace Student_Housing_Management_System
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddDbContext<StudentHousingDbContext>(options =>
+                options.UseSqlServer(
+                    builder.Configuration.GetConnectionString("StudentHousingDatabase")));
 
             var app = builder.Build();
 
