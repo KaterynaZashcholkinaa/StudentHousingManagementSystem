@@ -1,0 +1,37 @@
+﻿@model Student_Housing_Management_System.ViewModels.ApplicationViewModel
+
+@{
+    ViewData["Title"] = "Application Details";
+}
+
+<h1>Application Details</h1>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-3">Student</dt>
+        <dd class="col-sm-9">
+            @Model.StudentFirstName @Model.StudentLastName
+        </dd>
+
+        <dt class="col-sm-3">Room Number</dt>
+        <dd class="col-sm-9">@Model.RoomNumber</dd>
+
+        <dt class="col-sm-3">Building</dt>
+        <dd class="col-sm-9">@Model.BuildingName</dd>
+
+        <dt class="col-sm-3">Address</dt>
+        <dd class="col-sm-9">@Model.Address</dd>
+
+        <dt class="col-sm-3">Application Date</dt>
+        <dd class="col-sm-9">
+            @Model.ApplicationDate.ToString("dd-MM-yyyy")
+        </dd>
+
+        <dt class="col-sm-3">Status</dt>
+        <dd class="col-sm-9">@Model.ApplicationStatus</dd>
+    </dl>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary">
+    Back to Applications
+</a>

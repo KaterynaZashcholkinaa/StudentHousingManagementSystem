@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Student_Housing_Management_System.Data;
 using Student_Housing_Management_System.Repositories;
+using Student_Housing_Management_System.Services;
 
 namespace Student_Housing_Management_System
 {
@@ -18,6 +19,13 @@ namespace Student_Housing_Management_System
                     builder.Configuration.GetConnectionString("StudentHousingDatabase")));
             
             builder.Services.AddScoped<StudentRepository>();
+            builder.Services.AddScoped<ApplicationRepository>();
+            builder.Services.AddScoped<StudentRepository>();
+            builder.Services.AddScoped<RoomRepository>();
+            builder.Services.AddScoped<BuildingRepository>();
+
+            builder.Services.AddScoped<ApplicationService>();
+
 
             var app = builder.Build();
 

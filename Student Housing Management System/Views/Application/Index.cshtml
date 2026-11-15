@@ -1,0 +1,44 @@
+﻿@model List<Student_Housing_Management_System.ViewModels.ApplicationViewModel>
+
+@{
+    ViewData["Title"] = "Applications";
+}
+
+<h1>Applications</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Student</th>
+            <th>Room</th>
+            <th>Building</th>
+            <th>Address</th>
+            <th>Application Date</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var application in Model)
+        {
+            <tr>
+                <td>
+                    @application.StudentFirstName @application.StudentLastName
+                </td>
+                <td>@application.RoomNumber</td>
+                <td>@application.BuildingName</td>
+                <td>@application.Address</td>
+                <td>@application.ApplicationDate.ToString("dd-MM-yyyy")</td>
+                <td>@application.ApplicationStatus</td>
+                <td>
+                    <a asp-action="Details"
+                       asp-route-id="@application.ApplicationId"
+                       class="btn btn-primary">
+                        Details
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

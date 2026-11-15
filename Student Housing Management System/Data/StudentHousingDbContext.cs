@@ -61,6 +61,18 @@ namespace Student_Housing_Management_System.Data
                 .HasOne(a => a.Room)
                 .WithMany()
                 .HasForeignKey(a => a.RoomId);
+            modelBuilder.Entity<Application>()
+                .HasOne(a => a.Student)
+                .WithMany(s => s.Applications)
+                .HasForeignKey(a => a.StudentId);
+            modelBuilder.Entity<Application>()
+                .HasOne(a => a.Room)
+                .WithMany()
+                .HasForeignKey(a => a.RoomId);
+            modelBuilder.Entity<Room>()
+                .HasOne(r => r.Building)
+                .WithMany(b => b.Rooms)
+                .HasForeignKey(r => r.BuildingId);
         }
     }
 }
