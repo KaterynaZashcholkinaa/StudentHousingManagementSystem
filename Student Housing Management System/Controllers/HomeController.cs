@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Student_Housing_Management_System.Models;
 using Student_Housing_Management_System.Repositories;
 
 namespace Student_Housing_Management_System.Controllers
@@ -14,11 +15,9 @@ namespace Student_Housing_Management_System.Controllers
 
         public IActionResult Index()
         {
-            var students = _studentRepository.GetAll();
+            List<Student> students = _studentRepository.GetAll();
 
-            ViewBag.Students = students;
-
-            return View();
+            return View(students);
         }
     }
 }   
