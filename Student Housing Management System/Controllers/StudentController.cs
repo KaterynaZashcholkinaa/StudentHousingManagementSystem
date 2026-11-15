@@ -19,5 +19,25 @@ namespace Student_Housing_Management_System.Controllers
 
             return View(students);
         }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Create(Student student)
+        {
+            if (ModelState.IsValid)
+            {
+                _studentRepository.Add(student);
+
+                return RedirectToAction("Index");
+            }
+
+            return View(student);
+        }
     }
 }

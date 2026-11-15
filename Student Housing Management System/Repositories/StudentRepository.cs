@@ -22,5 +22,12 @@ namespace Student_Housing_Management_System.Repositories
         {
             return _context.Students.FirstOrDefault(s => s.StudentId == id);
         }
+
+        public void Add(Student student)
+        {
+            _context.Students.Add(student);
+            _context.SaveChanges();
+        }
+
     }
 }
