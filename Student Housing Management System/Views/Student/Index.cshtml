@@ -1,0 +1,40 @@
+﻿@model List<Student_Housing_Management_System.Models.Student>
+
+@{
+    ViewData["Title"] = "Student";
+}
+
+<h1>Students</h1>
+
+<p>Manage the students registered in the system.</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Count == 0)
+        {
+            <tr>
+                <td colspan="4">No students found.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var student in Model)
+            {
+                <tr>
+                    <td>@student.FirstName</td>
+                    <td>@student.LastName</td>
+                    <td>@student.Email</td>
+                    <td>@student.PhoneNumber</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

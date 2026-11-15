@@ -6,9 +6,7 @@ namespace Student_Housing_Management_System.Controllers
     {
         public IActionResult Index()
         {
-            List<Student> students = _studentRepository.GetAll();
-
-            return View(students);
+            return View();
         }
     }
 }   
