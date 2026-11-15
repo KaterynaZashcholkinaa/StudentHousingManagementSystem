@@ -29,5 +29,23 @@ namespace Student_Housing_Management_System.Repositories
             _context.SaveChanges();
         }
 
+        public bool Update(Student student)
+        {
+            Student? existingStudent = GetById(student.StudentId);
+
+            if (existingStudent == null)
+            {
+                return false;
+            }
+
+            existingStudent.FirstName = student.FirstName;
+            existingStudent.LastName = student.LastName;
+            existingStudent.Email = student.Email;
+            existingStudent.PhoneNumber = student.PhoneNumber;
+
+            _context.SaveChanges();
+
+            return true;
+        }
     }
 }

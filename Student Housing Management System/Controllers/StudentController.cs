@@ -39,5 +39,42 @@ namespace Student_Housing_Management_System.Controllers
 
             return View(student);
         }
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            Student? student = _studentRepository.GetById(id);
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            return View(student);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(int id, Student student)
+        {
+            if (id != student.StudentId)
+            {
+                return BadRequest();
+            }
+
+            if (ModelState.IsValid)
+            {
+                bool updated = _studentRepository.Update(student);
+
+                if (!updated)
+                {
+                    return NotFound();
+                }
+
+                return RedirectToAction("Index");
+            }
+
+            return View(student);
+        }
     }
 }

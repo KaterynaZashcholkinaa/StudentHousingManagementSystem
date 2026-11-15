@@ -19,6 +19,7 @@
             <th>Last Name</th>
             <th>Email</th>
             <th>Phone Number</th>
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -37,6 +38,13 @@
                     <td>@student.LastName</td>
                     <td>@student.Email</td>
                     <td>@student.PhoneNumber</td>
+                    <td>
+                        <a asp-action="Edit"
+                           asp-route-id="@student.StudentId"
+                           class="btn btn-primary btn-sm">
+                            Edit
+                        </a>
+                    </td>
                 </tr>
             }
         }
