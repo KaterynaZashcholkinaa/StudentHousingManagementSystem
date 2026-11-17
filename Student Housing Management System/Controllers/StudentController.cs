@@ -1,21 +1,22 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using Student_Housing_Management_System.Models;
-using Student_Housing_Management_System.Repositories;
+using Student_Housing_Management_System.Services;
 
 namespace Student_Housing_Management_System.Controllers
 {
     public class StudentController : Controller
     {
-        private readonly StudentRepository _studentRepository;
+        private readonly StudentService _studentService;
 
-        public StudentController(StudentRepository studentRepository)
+        public StudentController(StudentService studentService)
         {
-            _studentRepository = studentRepository;
+            _studentService = studentService;
         }
 
         public IActionResult Index()
         {
-            List<Student> students = _studentRepository.GetAll();
+            List<Student> students = _studentService.GetAll();
 
             return View(students);
         }
@@ -32,7 +33,7 @@ namespace Student_Housing_Management_System.Controllers
         {
             if (ModelState.IsValid)
             {
-                _studentRepository.Add(student);
+                _studentService.Add(student);
 
                 return RedirectToAction("Index");
             }
@@ -43,7 +44,7 @@ namespace Student_Housing_Management_System.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            Student? student = _studentRepository.GetById(id);
+            Student? student = _studentService.GetById(id);
 
             if (student == null)
             {
@@ -64,7 +65,7 @@ namespace Student_Housing_Management_System.Controllers
 
             if (ModelState.IsValid)
             {
-                bool updated = _studentRepository.Update(student);
+                bool updated = _studentService.Update(student);
 
                 if (!updated)
                 {
@@ -80,7 +81,7 @@ namespace Student_Housing_Management_System.Controllers
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            Student? student = _studentRepository.GetById(id);
+            Student? student = _studentService.GetById(id);
 
             if (student == null)
             {
@@ -94,7 +95,7 @@ namespace Student_Housing_Management_System.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            bool deleted = _studentRepository.Delete(id);
+            bool deleted = _studentService.Delete(id);
 
             if (!deleted)
             {
