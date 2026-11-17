@@ -47,5 +47,20 @@ namespace Student_Housing_Management_System.Repositories
 
             return true;
         }
+
+        public bool Delete(int id)
+        {
+            Student? student = GetById(id);
+
+            if (student == null)
+            {
+                return false;
+            }
+
+            _context.Students.Remove(student);
+            _context.SaveChanges();
+
+            return true;
+        }
     }
 }

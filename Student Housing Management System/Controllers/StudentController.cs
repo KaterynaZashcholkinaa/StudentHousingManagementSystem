@@ -76,5 +76,33 @@ namespace Student_Housing_Management_System.Controllers
 
             return View(student);
         }
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            Student? student = _studentRepository.GetById(id);
+
+            if (student == null)
+            {
+                return NotFound();
+            }
+
+            return View(student);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(int id)
+        {
+            bool deleted = _studentRepository.Delete(id);
+
+            if (!deleted)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction("Index");
+        }
+
     }
 }
