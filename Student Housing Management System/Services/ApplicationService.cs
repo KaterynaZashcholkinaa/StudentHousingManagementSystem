@@ -1,4 +1,6 @@
-﻿
+﻿using Microsoft.Identity.Client;
+using Student_Housing_Management_System.Models;
+using Student_Housing_Management_System.Models.Enums;
 using Student_Housing_Management_System.Repositories;
 using Student_Housing_Management_System.ViewModels;
 
@@ -74,6 +76,8 @@ namespace Student_Housing_Management_System.Services
             return new ApplicationViewModel
             {
                 ApplicationId = application.ApplicationId,
+                StudentId = application.StudentId,
+                RoomId = application.RoomId,
                 StudentFirstName = student?.FirstName ?? string.Empty,
                 StudentLastName = student?.LastName ?? string.Empty,
                 RoomNumber = room?.RoomNumber ?? string.Empty,
@@ -82,6 +86,34 @@ namespace Student_Housing_Management_System.Services
                 ApplicationDate = application.ApplicationDate,
                 ApplicationStatus = application.ApplicationStatus
             };
+        }
+
+        public bool Add(Application application)
+        {
+            var student = _studentRepository.GetById(application.StudentId);
+            var room = _roomRepository.GetById(application.RoomId); 
+
+            if (student == null || room == null)
+            {
+                return false;
+            }
+
+            application.ApplicationDate = DateOnly.FromDateTime(DateTime.Today);
+
+            _applicationRepository.Add(application);
+
+            return true;
+        }
+
+
+        public bool UpdateStatus(int applicationId, ApplicationStatus status)
+        {
+            return _applicationRepository.UpdateStatus(applicationId, status);
+        }
+
+        public bool Delete(int applicationId)
+        {
+            return _applicationRepository.Delete(applicationId);
         }
     }
 }

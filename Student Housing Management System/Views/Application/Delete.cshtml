@@ -1,0 +1,47 @@
+﻿@model Student_Housing_Management_System.ViewModels.ApplicationViewModel
+
+@{
+    ViewData["Title"] = "Delete Application";
+}
+
+<h1>Delete Application</h1>
+
+<h5>Are you sure you want to delete this application?</h5>
+
+<div class="mb-3">
+    <label class="form-label">Student</label>
+    <input value="@Model.StudentFirstName @Model.StudentLastName"
+           class="form-control" readonly />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Room</label>
+    <input value="@Model.RoomNumber" class="form-control" readonly />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Building</label>
+    <input value="@Model.BuildingName" class="form-control" readonly />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Address</label>
+    <input value="@Model.Address" class="form-control" readonly />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Application Date</label>
+    <input value="@Model.ApplicationDate" class="form-control" readonly />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Status</label>
+    <input value="@Model.ApplicationStatus" class="form-control" readonly />
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" name="id" value="@Model.ApplicationId" />
+
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

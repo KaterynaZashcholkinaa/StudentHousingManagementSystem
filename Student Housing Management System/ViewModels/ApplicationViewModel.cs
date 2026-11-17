@@ -5,6 +5,8 @@ namespace Student_Housing_Management_System.ViewModels
     public class ApplicationViewModel
     {
         public int ApplicationId { get; set; }
+        public int StudentId { get; set; }
+        public int RoomId { get; set; }
         public string StudentFirstName { get; set; } = string.Empty;
         public string StudentLastName { get; set; } = string.Empty;
         public string RoomNumber { get; set; } = string.Empty;
