@@ -103,6 +103,5 @@ namespace Student_Housing_Management_System.Controllers
 
             return RedirectToAction("Index");
         }
-
     }
 }

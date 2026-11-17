@@ -6,6 +6,10 @@
 
 <h1>Applications</h1>
 
+<a asp-action="Create" class="btn btn-primary mb-3">
+    Add Application
+</a>
+
 <table class="table">
     <thead>
         <tr>
@@ -30,7 +34,37 @@
                 <td>@application.BuildingName</td>
                 <td>@application.Address</td>
                 <td>@application.ApplicationDate.ToString("dd-MM-yyyy")</td>
-                <td>@application.ApplicationStatus</td>
+
+                <td>
+                    <form asp-action="EditStatus"
+                          asp-route-id="@application.ApplicationId"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden"
+                               name="ApplicationId"
+                               value="@application.ApplicationId" />
+
+                        <select name="ApplicationStatus"
+                                class="form-select"
+                                onchange="this.form.submit()">
+
+                            @foreach (var status in Enum.GetValues<Student_Housing_Management_System.Models.Enums.ApplicationStatus>())
+                            {
+                                if (status == application.ApplicationStatus)
+                                {
+                                    <option value="@status" selected>@status</option>
+                                }
+                                else
+                                {
+                                    <option value="@status">@status</option>
+                                }
+                            }
+                        </select>
+                    </form>
+                </td>
+
                 <td>
                     <a asp-action="Details"
                        asp-route-id="@application.ApplicationId"
