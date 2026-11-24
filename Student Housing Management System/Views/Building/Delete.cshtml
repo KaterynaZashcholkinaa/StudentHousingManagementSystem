@@ -4,6 +4,8 @@
     ViewData["Title"] = "Delete Building";
 }
 
+@await Html.PartialAsync("_ErrorMessage", TempData["ErrorMessage"] as string)
+
 <h1>Delete Building</h1>
 
 <h4>Are you sure you want to delete this building?</h4>

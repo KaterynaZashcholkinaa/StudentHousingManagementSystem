@@ -4,6 +4,8 @@
     ViewData["Title"] = "Add Building";
 }
 
+@await Html.PartialAsync("_ErrorMessage", TempData["ErrorMessage"] as string)
+
 <h1>Add Building</h1>
 
 <form asp-action="Create" method="post">

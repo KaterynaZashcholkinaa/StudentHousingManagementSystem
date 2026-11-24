@@ -1,4 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Student_Housing_Management_System.Models;
 using Student_Housing_Management_System.Services;
 using Student_Housing_Management_System.ViewModels;
@@ -8,31 +9,54 @@ namespace Student_Housing_Management_System.Controllers
     public class ApplicationController : Controller
     {
         private readonly ApplicationService _applicationService;
+        private readonly ILogger<ApplicationController> _logger;
 
-        public ApplicationController(ApplicationService applicationService)
+        public ApplicationController(ApplicationService applicationService,ILogger<ApplicationController> logger)
         {
             _applicationService = applicationService;
+            _logger = logger;
         }
 
         public IActionResult Index()
         {
-            var applications = _applicationService.GetAll();
+            try
+            {
+                var applications = _applicationService.GetAll();
 
-            return View(applications);
+                return View(applications);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving applications.");
+
+                TempData["ErrorMessage"] = "Unable to load applications. Please try again.";
+
+                return View(new List<ApplicationViewModel>());
+            }
         }
 
         public IActionResult Details(int id)
         {
-            var application = _applicationService.GetById(id);
-
-            if (application == null)
+            try
             {
-                return NotFound();
+                var application = _applicationService.GetById(id);
+
+                if (application == null)
+                {
+                    return NotFound();
+                }
+
+                return View(application);
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving application with ID {ApplicationId}.", id);
 
-            return View(application);
+                TempData["ErrorMessage"] = "Unable to load application details. Please try again.";
+
+                return RedirectToAction("Index");
+            }
         }
-
 
         [HttpGet]
         public IActionResult Create()
@@ -44,26 +68,58 @@ namespace Student_Housing_Management_System.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Application application)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _applicationService.Add(application);
-                return RedirectToAction("Index");
+                return View(application);
             }
 
-            return View(application);
+            try
+            {
+                _applicationService.Add(application);
+
+                return RedirectToAction("Index");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database error while creating an application.");
+
+                TempData["ErrorMessage"] = "Unable to save the application. Please check the selected student and room.";
+
+                return View(application);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating an application.");
+
+                TempData["ErrorMessage"] ="Something went wrong while creating the application.";
+
+                return View(application);
+            }
         }
 
         [HttpGet]
         public IActionResult EditStatus(int id)
         {
-            ApplicationViewModel? application = _applicationService.GetById(id);
-
-            if (application == null)
+            try
             {
-                return NotFound();
-            }
+                ApplicationViewModel? application =
+                    _applicationService.GetById(id);
 
-            return View(application);
+                if (application == null)
+                {
+                    return NotFound();
+                }
+
+                return View(application);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,"Error while retrieving application with ID {ApplicationId}.", id);
+
+                TempData["ErrorMessage"] = "Unable to load the application. Please try again.";
+
+                return RedirectToAction("Index");
+            }
         }
 
         [HttpPost]
@@ -75,7 +131,32 @@ namespace Student_Housing_Management_System.Controllers
                 return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+            {
+                try
+                {
+                    ApplicationViewModel? existingApplication = _applicationService.GetById(id);
+
+                    if (existingApplication == null)
+                    {
+                        return NotFound();
+                    }
+
+                    existingApplication.ApplicationStatus = application.ApplicationStatus;
+
+                    return View(existingApplication);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error while retrieving application with ID {ApplicationId}.", id);
+
+                    TempData["ErrorMessage"] = "Unable to load the application. Please try again.";
+
+                    return RedirectToAction("Index");
+                }
+            }
+
+            try
             {
                 bool updated = _applicationService.UpdateStatus(application.ApplicationId,application.ApplicationStatus);
 
@@ -86,44 +167,79 @@ namespace Student_Housing_Management_System.Controllers
 
                 return RedirectToAction("Index");
             }
-
-            ApplicationViewModel? existingApplication =_applicationService.GetById(id);
-
-            if (existingApplication == null)
+            catch (DbUpdateException ex)
             {
-                return NotFound();
+                _logger.LogError(ex,"Database error while updating application with ID {ApplicationId}.", id);
+
+                TempData["ErrorMessage"] ="Unable to update the application status. Please try again.";
+
+                return RedirectToAction("Index");
             }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,"Error while updating application with ID {ApplicationId}.", id);
 
-            existingApplication.ApplicationStatus = application.ApplicationStatus;
+                TempData["ErrorMessage"] ="Something went wrong while updating the application status.";
 
-            return View(existingApplication);
+                return RedirectToAction("Index");
+            }
         }
 
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            ApplicationViewModel? application = _applicationService.GetById(id);
-
-            if (application == null)
+            try
             {
-                return NotFound();
-            }
+                ApplicationViewModel? application = _applicationService.GetById(id);
 
-            return View(application);
+                if (application == null)
+                {
+                    return NotFound();
+                }
+
+                return View(application);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,"Error while retrieving application with ID {ApplicationId}.", id);
+
+                TempData["ErrorMessage"] ="Unable to load the application. Please try again.";
+
+                return RedirectToAction("Index");
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            bool deleted = _applicationService.Delete(id);
-
-            if (!deleted)
+            try
             {
-                return NotFound();
-            }
+                bool deleted = _applicationService.Delete(id);
 
-            return RedirectToAction("Index");
+                if (!deleted)
+                {
+                    return NotFound();
+                }
+
+                return RedirectToAction("Index");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex,"Database error while deleting application with ID {ApplicationId}.", id);
+
+                TempData["ErrorMessage"] ="Unable to delete the application because it may be referenced by other records.";
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex,"Error while deleting application with ID {ApplicationId}.", id);
+
+                TempData["ErrorMessage"] ="Something went wrong while deleting the application.";
+
+                return RedirectToAction("Index");
+            }
         }
     }
 }

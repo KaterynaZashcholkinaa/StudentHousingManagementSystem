@@ -4,6 +4,8 @@
     ViewData["Title"] = "Student";
 }
 
+@await Html.PartialAsync("_ErrorMessage", TempData["ErrorMessage"] as string)
+
 <h1>Students</h1>
 
 <p>Manage the students registered in the system.</p>

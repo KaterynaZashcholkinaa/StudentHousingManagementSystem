@@ -4,6 +4,8 @@
     ViewData["Title"] = "Building Details";
 }
 
+@await Html.PartialAsync("_ErrorMessage", TempData["ErrorMessage"] as string)
+
 <h1>@Model.Name</h1>
 
 <p><strong>Address:</strong> @Model.Address</p>

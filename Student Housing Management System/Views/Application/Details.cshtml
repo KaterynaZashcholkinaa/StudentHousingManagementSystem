@@ -4,6 +4,8 @@
     ViewData["Title"] = "Application Details";
 }
 
+@await Html.PartialAsync("_ErrorMessage", TempData["ErrorMessage"] as string)
+
 <h1>Application Details</h1>
 
 <div>

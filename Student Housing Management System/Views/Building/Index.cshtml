@@ -4,6 +4,8 @@
     ViewData["Title"] = "Buildings";
 }
 
+@await Html.PartialAsync("_ErrorMessage", TempData["ErrorMessage"] as string)
+
 <h1>Buildings</h1>
 
 <a asp-action="Create" class="btn btn-primary mb-3">

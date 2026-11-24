@@ -4,6 +4,8 @@
     ViewData["Title"] = "Edit Room";
 }
 
+@await Html.PartialAsync("_ErrorMessage", TempData["ErrorMessage"] as string)
+
 <h1>Edit Room</h1>
 
 <form asp-action="Edit" method="post">

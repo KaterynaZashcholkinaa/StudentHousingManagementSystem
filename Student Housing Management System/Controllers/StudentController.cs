@@ -1,4 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Student_Housing_Management_System.Models;
 using Student_Housing_Management_System.Services;
 
@@ -7,17 +8,30 @@ namespace Student_Housing_Management_System.Controllers
     public class StudentController : Controller
     {
         private readonly StudentService _studentService;
+        private readonly ILogger<StudentController> _logger;
 
-        public StudentController(StudentService studentService)
+        public StudentController(StudentService studentService,ILogger<StudentController> logger)
         {
             _studentService = studentService;
+            _logger = logger;
         }
 
         public IActionResult Index()
         {
-            List<Student> students = _studentService.GetAll();
+            try
+            {
+                List<Student> students = _studentService.GetAll();
 
-            return View(students);
+                return View(students);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving students.");
+
+                TempData["ErrorMessage"] = "Unable to load students. Please try again.";
+
+                return View(new List<Student>());
+            }
         }
 
         [HttpGet]
@@ -30,27 +44,57 @@ namespace Student_Housing_Management_System.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Student student)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+            {
+                return View(student);
+            }
+
+            try
             {
                 _studentService.Add(student);
 
                 return RedirectToAction("Index");
             }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database error while creating a student.");
 
-            return View(student);
+                TempData["ErrorMessage"] = "Unable to save the student. Please check the information and try again.";
+
+                return View(student);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a student.");
+
+                TempData["ErrorMessage"] = "Something went wrong while creating the student.";
+
+                return View(student);
+            }
         }
 
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            Student? student = _studentService.GetById(id);
-
-            if (student == null)
+            try
             {
-                return NotFound();
-            }
+                Student? student = _studentService.GetById(id);
 
-            return View(student);
+                if (student == null)
+                {
+                    return NotFound();
+                }
+
+                return View(student);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving student with ID {StudentId}.", id);
+
+                TempData["ErrorMessage"] = "Unable to load the student. Please try again.";
+
+                return RedirectToAction("Index");
+            }
         }
 
         [HttpPost]
@@ -62,7 +106,12 @@ namespace Student_Housing_Management_System.Controllers
                 return BadRequest();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+            {
+                return View(student);
+            }
+
+            try
             {
                 bool updated = _studentService.Update(student);
 
@@ -73,35 +122,79 @@ namespace Student_Housing_Management_System.Controllers
 
                 return RedirectToAction("Index");
             }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database error while updating student with ID {StudentId}.", id);
 
-            return View(student);
+                TempData["ErrorMessage"] = "Unable to update the student. Please try again.";
+
+                return View(student);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating student with ID {StudentId}.", id);
+
+                TempData["ErrorMessage"] = "Something went wrong while updating the student.";
+
+                return View(student);
+            }
         }
 
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            Student? student = _studentService.GetById(id);
-
-            if (student == null)
+            try
             {
-                return NotFound();
-            }
+                Student? student = _studentService.GetById(id);
 
-            return View(student);
+                if (student == null)
+                {
+                    return NotFound();
+                }
+
+                return View(student);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving student with ID {StudentId}.", id);
+
+                TempData["ErrorMessage"] = "Unable to load the student. Please try again.";
+
+                return RedirectToAction("Index");
+            }
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(int id)
         {
-            bool deleted = _studentService.Delete(id);
-
-            if (!deleted)
+            try
             {
-                return NotFound();
-            }
+                bool deleted = _studentService.Delete(id);
 
-            return RedirectToAction("Index");
+                if (!deleted)
+                {
+                    return NotFound();
+                }
+
+                return RedirectToAction("Index");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "Database error while deleting student with ID {StudentId}.", id);
+
+                TempData["ErrorMessage"] = "Unable to delete this student because they may have related applications.";
+
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting student with ID {StudentId}.", id);
+
+                TempData["ErrorMessage"] = "Something went wrong while deleting the student.";
+
+                return RedirectToAction("Index");
+            }
         }
     }
 }
