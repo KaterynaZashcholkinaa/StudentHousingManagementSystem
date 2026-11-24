@@ -77,6 +77,8 @@ namespace Student_Housing_Management_System.Controllers
             {
                 _applicationService.Add(application);
 
+                TempData["SuccessMessage"] = "Application was successfully created.";
+
                 return RedirectToAction("Index");
             }
             catch (DbUpdateException ex)
@@ -221,6 +223,8 @@ namespace Student_Housing_Management_System.Controllers
                 {
                     return NotFound();
                 }
+
+                TempData["SuccessMessage"] = "Application was successfully deleted.";
 
                 return RedirectToAction("Index");
             }

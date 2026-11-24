@@ -5,6 +5,7 @@
 }
 
 @await Html.PartialAsync("_ErrorMessage", TempData["ErrorMessage"] as string)
+@await Html.PartialAsync("_SuccessMessage", TempData["SuccessMessage"] as string)
 
 <h1>Students</h1>
 

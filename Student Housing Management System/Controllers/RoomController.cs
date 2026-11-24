@@ -65,6 +65,8 @@ namespace Student_Housing_Management_System.Controllers
 
                 _roomService.Add(room);
 
+                TempData["SuccessMessage"] = "Room created successfully.";
+
                 return RedirectToAction("Details", "Building",new { id = room.BuildingId });
             }
             catch (DbUpdateException ex)
@@ -138,6 +140,8 @@ namespace Student_Housing_Management_System.Controllers
                     return NotFound();
                 }
 
+                TempData["SuccessMessage"] = "Room updated successfully.";
+
                 return RedirectToAction("Details", "Building", new { id = room.BuildingId });
             }
             catch (DbUpdateException ex)
@@ -206,6 +210,8 @@ namespace Student_Housing_Management_System.Controllers
                     return RedirectToAction("Details", "Building",
                         new { id = buildingId });
                 }
+
+                TempData["SuccessMessage"] = "Room deleted successfully.";
 
                 return RedirectToAction("Details", "Building", new { id = buildingId });
             }

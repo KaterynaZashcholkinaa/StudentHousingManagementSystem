@@ -53,6 +53,8 @@ namespace Student_Housing_Management_System.Controllers
             {
                 _studentService.Add(student);
 
+                TempData["SuccessMessage"] = "Student was successfully created.";
+
                 return RedirectToAction("Index");
             }
             catch (DbUpdateException ex)
@@ -120,6 +122,8 @@ namespace Student_Housing_Management_System.Controllers
                     return NotFound();
                 }
 
+                TempData["SuccessMessage"] = "Student was successfully updated.";
+
                 return RedirectToAction("Index");
             }
             catch (DbUpdateException ex)
@@ -176,6 +180,8 @@ namespace Student_Housing_Management_System.Controllers
                 {
                     return NotFound();
                 }
+
+                TempData["SuccessMessage"] = "Student was successfully deleted.";
 
                 return RedirectToAction("Index");
             }
