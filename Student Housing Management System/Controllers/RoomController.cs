@@ -1,4 +1,3 @@
-﻿
 using Microsoft.AspNetCore.Mvc;
 using Student_Housing_Management_System.Models;
 using Student_Housing_Management_System.Services;
