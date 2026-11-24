@@ -26,9 +26,7 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while retrieving buildings.");
-
-                TempData["ErrorMessage"] ="Unable to load buildings. Please try again.";
+                SetErrorMessage(ex, "Error while retrieving buildings.","Unable to load buildings. Please try again.");
 
                 return View(new List<Building>());
             }
@@ -49,11 +47,7 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while retrieving building with ID {BuildingId}.", id);
-
-                TempData["ErrorMessage"] ="Unable to load building details. Please try again.";
-
-                return RedirectToAction("Index");
+                return HandleLoadError(ex, id,"Unable to load building details. Please try again.");
             }
         }
 
@@ -82,19 +76,11 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Database error while creating a building.");
-
-                TempData["ErrorMessage"] = "Unable to save the building. Please check the information and try again.";
-
-                return View(building);
+                return HandleFormError(building, ex, "Database error while creating a building.", "Unable to save the building. Please check the information and try again.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while creating a building.");
-
-                TempData["ErrorMessage"] = "Something went wrong while creating the building.";
-
-                return View(building);
+                return HandleFormError(building, ex,  "Error while creating a building.", "Something went wrong while creating the building.");
             }
         }
 
@@ -114,11 +100,7 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while retrieving building with ID {BuildingId}.", id);
-
-                TempData["ErrorMessage"] ="Unable to load the building. Please try again.";
-
-                return RedirectToAction("Index");
+                return HandleLoadError(ex, id, "Unable to load the building. Please try again.");
             }
         }
 
@@ -142,23 +124,15 @@ namespace Student_Housing_Management_System.Controllers
 
                 TempData["SuccessMessage"] = "Building updated successfully.";
 
-                return RedirectToAction("Details",new { id = building.BuildingId });
+                return RedirectToAction("Details", new { id = building.BuildingId });
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex,"Database error while updating building with ID {BuildingId}.",building.BuildingId);
-
-                TempData["ErrorMessage"] ="Unable to update the building. Please try again.";
-
-                return View(building);
+                return HandleFormError(building, ex, $"Database error while updating building with ID {building.BuildingId}.", "Unable to update the building. Please try again.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while updating building with ID {BuildingId}.",building.BuildingId);
-
-                TempData["ErrorMessage"] = "Something went wrong while updating the building.";
-
-                return View(building);
+                return HandleFormError(building, ex,   $"Error while updating building with ID {building.BuildingId}.",  "Something went wrong while updating the building.");
             }
         }
 
@@ -178,11 +152,7 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while retrieving building with ID {BuildingId}.", id);
-
-                TempData["ErrorMessage"] ="Unable to load the building. Please try again.";
-
-                return RedirectToAction("Index");
+                return HandleLoadError(ex, id, "Unable to load the building. Please try again.");
             }
         }
 
@@ -196,7 +166,7 @@ namespace Student_Housing_Management_System.Controllers
 
                 if (!deleted)
                 {
-                    TempData["ErrorMessage"] ="The building cannot be deleted because it does not exist or still has rooms.";
+                    TempData["ErrorMessage"] =  "The building cannot be deleted because it does not exist or still has rooms.";
 
                     return RedirectToAction("Details", new { id });
                 }
@@ -207,20 +177,36 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex,"Database error while deleting building with ID {BuildingId}.", id);
-
-                TempData["ErrorMessage"] ="Unable to delete the building because it may contain related records.";
+                SetErrorMessage(ex, $"Database error while deleting building with ID {id}.", "Unable to delete the building because it may contain related records.");
 
                 return RedirectToAction("Details", new { id });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while deleting building with ID {BuildingId}.", id);
-
-                TempData["ErrorMessage"] ="Something went wrong while deleting the building.";
+                SetErrorMessage(ex,  $"Error while deleting building with ID {id}.", "Something went wrong while deleting the building.");
 
                 return RedirectToAction("Index");
             }
+        }
+
+        private void SetErrorMessage(Exception ex, string logMessage, string userMessage)
+        {
+            _logger.LogError(ex, logMessage);
+            TempData["ErrorMessage"] = userMessage;
+        }
+
+        private IActionResult HandleLoadError(Exception ex, int id, string userMessage)
+        {
+            SetErrorMessage(ex, $"Error while retrieving building with ID {id}.",  userMessage);
+
+            return RedirectToAction("Index");
+        }
+
+        private IActionResult HandleFormError(  Building building,  Exception ex, string logMessage, string userMessage)
+        {
+            SetErrorMessage(ex, logMessage, userMessage);
+
+            return View(building);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Student_Housing_Management_System.Models;
 using Student_Housing_Management_System.Services;
@@ -27,9 +28,7 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while retrieving applications.");
-
-                TempData["ErrorMessage"] = "Unable to load applications. Please try again.";
+                SetErrorMessage(ex,"Error while retrieving applications.","Unable to load applications. Please try again.");
 
                 return View(new List<ApplicationViewModel>());
             }
@@ -39,7 +38,7 @@ namespace Student_Housing_Management_System.Controllers
         {
             try
             {
-                var application = _applicationService.GetById(id);
+                ApplicationViewModel? application = _applicationService.GetById(id);
 
                 if (application == null)
                 {
@@ -50,11 +49,7 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while retrieving application with ID {ApplicationId}.", id);
-
-                TempData["ErrorMessage"] = "Unable to load application details. Please try again.";
-
-                return RedirectToAction("Index");
+                return HandleLoadError(ex, id,"Unable to load application details. Please try again.");
             }
         }
 
@@ -83,19 +78,11 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Database error while creating an application.");
-
-                TempData["ErrorMessage"] = "Unable to save the application. Please check the selected student and room.";
-
-                return View(application);
+                return HandleFormError(application, ex,"Database error while creating an application.","Unable to save the application. Please check the selected student and room.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while creating an application.");
-
-                TempData["ErrorMessage"] ="Something went wrong while creating the application.";
-
-                return View(application);
+                return HandleFormError(application, ex,"Error while creating an application.","Something went wrong while creating the application.");
             }
         }
 
@@ -104,8 +91,7 @@ namespace Student_Housing_Management_System.Controllers
         {
             try
             {
-                ApplicationViewModel? application =
-                    _applicationService.GetById(id);
+                ApplicationViewModel? application = _applicationService.GetById(id);
 
                 if (application == null)
                 {
@@ -116,11 +102,7 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while retrieving application with ID {ApplicationId}.", id);
-
-                TempData["ErrorMessage"] = "Unable to load the application. Please try again.";
-
-                return RedirectToAction("Index");
+                return HandleLoadError(ex, id,"Unable to load the application. Please try again.");
             }
         }
 
@@ -137,7 +119,8 @@ namespace Student_Housing_Management_System.Controllers
             {
                 try
                 {
-                    ApplicationViewModel? existingApplication = _applicationService.GetById(id);
+                    ApplicationViewModel? existingApplication =
+                        _applicationService.GetById(id);
 
                     if (existingApplication == null)
                     {
@@ -150,11 +133,7 @@ namespace Student_Housing_Management_System.Controllers
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error while retrieving application with ID {ApplicationId}.", id);
-
-                    TempData["ErrorMessage"] = "Unable to load the application. Please try again.";
-
-                    return RedirectToAction("Index");
+                    return HandleLoadError(ex, id,"Unable to load the application. Please try again.");
                 }
             }
 
@@ -167,21 +146,19 @@ namespace Student_Housing_Management_System.Controllers
                     return NotFound();
                 }
 
+                TempData["SuccessMessage"] = "Application status was successfully updated.";
+
                 return RedirectToAction("Index");
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex,"Database error while updating application with ID {ApplicationId}.", id);
-
-                TempData["ErrorMessage"] ="Unable to update the application status. Please try again.";
+                SetErrorMessage(ex,$"Database error while updating application with ID {id}.","Unable to update the application status. Please try again.");
 
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while updating application with ID {ApplicationId}.", id);
-
-                TempData["ErrorMessage"] ="Something went wrong while updating the application status.";
+                SetErrorMessage(ex,$"Error while updating application with ID {id}.","Something went wrong while updating the application status.");
 
                 return RedirectToAction("Index");
             }
@@ -203,11 +180,7 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while retrieving application with ID {ApplicationId}.", id);
-
-                TempData["ErrorMessage"] ="Unable to load the application. Please try again.";
-
-                return RedirectToAction("Index");
+                return HandleLoadError(ex, id,"Unable to load the application. Please try again.");
             }
         }
 
@@ -230,20 +203,38 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex,"Database error while deleting application with ID {ApplicationId}.", id);
-
-                TempData["ErrorMessage"] ="Unable to delete the application because it may be referenced by other records.";
+                SetErrorMessage(ex, $"Database error while deleting application with ID {id}.", "Unable to delete the application because it may be referenced by other records.");
 
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while deleting application with ID {ApplicationId}.", id);
-
-                TempData["ErrorMessage"] ="Something went wrong while deleting the application.";
+                SetErrorMessage(ex, $"Error while deleting application with ID {id}.", "Something went wrong while deleting the application.");
 
                 return RedirectToAction("Index");
             }
+        }
+
+        private void SetErrorMessage(Exception ex, string logMessage, string userMessage)
+        {
+            _logger.LogError(ex, logMessage);
+            TempData["ErrorMessage"] = userMessage;
+        }
+
+        private IActionResult HandleLoadError(Exception ex, int id, string userMessage)
+        {
+            SetErrorMessage(ex,
+                $"Error while retrieving application with ID {id}.",
+                userMessage);
+
+            return RedirectToAction("Index");
+        }
+
+        private IActionResult HandleFormError(Application application,Exception ex,string logMessage,string userMessage)
+        {
+            SetErrorMessage(ex, logMessage, userMessage);
+
+            return View(application);
         }
     }
 }

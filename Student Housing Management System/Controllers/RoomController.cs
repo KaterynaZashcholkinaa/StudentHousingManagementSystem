@@ -30,18 +30,16 @@ namespace Student_Housing_Management_System.Controllers
                     return NotFound();
                 }
 
-                Room room = new Room();
-                room.BuildingId = buildingId;
+                Room room = new Room
+                {
+                    BuildingId = buildingId
+                };
 
                 return View(room);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while preparing room creation for building with ID {BuildingId}.",buildingId);
-
-                TempData["ErrorMessage"] = "Unable to load the room creation page. Please try again.";
-
-                return RedirectToAction("Details", "Building",new { id = buildingId });
+                return HandleLoadError(ex, $"Error while preparing room creation for building with ID {buildingId}.", "Unable to load the room creation page. Please try again.", buildingId);
             }
         }
 
@@ -71,19 +69,11 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex,"Database error while creating a room in building with ID {BuildingId}.",room.BuildingId);
-
-                TempData["ErrorMessage"] ="Unable to save the room. Please check the information and try again.";
-
-                return View(room);
+                return HandleFormError(room, ex, $"Database error while creating a room in building with ID {room.BuildingId}.", "Unable to save the room. Please check the information and try again.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while creating a room in building with ID {BuildingId}.",room.BuildingId);
-
-                TempData["ErrorMessage"] ="Something went wrong while creating the room.";
-
-                return View(room);
+                return HandleFormError(room, ex,  $"Error while creating a room in building with ID {room.BuildingId}.", "Something went wrong while creating the room.");
             }
         }
 
@@ -103,11 +93,7 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while retrieving room with ID {RoomId}.", id);
-
-                TempData["ErrorMessage"] ="Unable to load the room. Please try again.";
-
-                return RedirectToAction("Index", "Building");
+                return HandleLoadError(ex, $"Error while retrieving room with ID {id}.",  "Unable to load the room. Please try again.");
             }
         }
 
@@ -124,14 +110,12 @@ namespace Student_Housing_Management_System.Controllers
                     return NotFound();
                 }
 
+                room.BuildingId = existingRoom.BuildingId;
+
                 if (!ModelState.IsValid)
                 {
-                    room.BuildingId = existingRoom.BuildingId;
-
                     return View(room);
                 }
-
-                room.BuildingId = existingRoom.BuildingId;
 
                 bool updated = _roomService.Update(room);
 
@@ -142,23 +126,15 @@ namespace Student_Housing_Management_System.Controllers
 
                 TempData["SuccessMessage"] = "Room updated successfully.";
 
-                return RedirectToAction("Details", "Building", new { id = room.BuildingId });
+                return RedirectToAction("Details", "Building",new { id = room.BuildingId });
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Database error while updating room with ID {RoomId}.",room.RoomId);
-
-                TempData["ErrorMessage"] = "Unable to update the room. Please try again.";
-
-                return View(room);
+                return HandleFormError(room, ex, $"Database error while updating room with ID {room.RoomId}.", "Unable to update the room. Please try again.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while updating room with ID {RoomId}.", room.RoomId);
-
-                TempData["ErrorMessage"] ="Something went wrong while updating the room.";
-
-                return View(room);
+                return HandleFormError(room, ex,$"Error while updating room with ID {room.RoomId}.","Something went wrong while updating the room.");
             }
         }
 
@@ -178,11 +154,7 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"Error while retrieving room with ID {RoomId}.", id);
-
-                TempData["ErrorMessage"] = "Unable to load the room. Please try again.";
-
-                return RedirectToAction("Index", "Building");
+                return HandleLoadError(ex, $"Error while retrieving room with ID {id}.", "Unable to load the room. Please try again.");
             }
         }
 
@@ -205,7 +177,7 @@ namespace Student_Housing_Management_System.Controllers
 
                 if (!deleted)
                 {
-                    TempData["ErrorMessage"] ="This room cannot be deleted because it has related applications.";
+                    TempData["ErrorMessage"] = "This room cannot be deleted because it has related applications.";
 
                     return RedirectToAction("Details", "Building",
                         new { id = buildingId });
@@ -213,24 +185,46 @@ namespace Student_Housing_Management_System.Controllers
 
                 TempData["SuccessMessage"] = "Room deleted successfully.";
 
-                return RedirectToAction("Details", "Building", new { id = buildingId });
+                return RedirectToAction("Details", "Building",  new { id = buildingId });
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex,"Database error while deleting room with ID {RoomId}.", id);
-
-                TempData["ErrorMessage"] = "Unable to delete this room because it may have related applications.";
+                SetErrorMessage(ex, $"Database error while deleting room with ID {id}.", "Unable to delete this room because it may have related applications.");
 
                 return RedirectToAction("Index", "Building");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while deleting room with ID {RoomId}.", id);
-
-                TempData["ErrorMessage"] = "Something went wrong while deleting the room.";
+                SetErrorMessage(ex, $"Error while deleting room with ID {id}.", "Something went wrong while deleting the room.");
 
                 return RedirectToAction("Index", "Building");
             }
+        }
+
+        private void SetErrorMessage(Exception ex, string logMessage, string userMessage)
+        {
+            _logger.LogError(ex, logMessage);
+            TempData["ErrorMessage"] = userMessage;
+        }
+
+        private IActionResult HandleLoadError(Exception ex,string logMessage,string userMessage,int? buildingId = null)
+        {
+            SetErrorMessage(ex, logMessage, userMessage);
+
+            if (buildingId.HasValue)
+            {
+                return RedirectToAction("Details", "Building",
+                    new { id = buildingId.Value });
+            }
+
+            return RedirectToAction("Index", "Building");
+        }
+
+        private IActionResult HandleFormError( Room room,Exception ex,string logMessage,string userMessage)
+        {
+            SetErrorMessage(ex, logMessage, userMessage);
+
+            return View(room);
         }
     }
 }

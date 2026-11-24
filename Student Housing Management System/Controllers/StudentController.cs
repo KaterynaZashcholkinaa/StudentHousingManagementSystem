@@ -26,9 +26,7 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while retrieving students.");
-
-                TempData["ErrorMessage"] = "Unable to load students. Please try again.";
+                SetErrorMessage(ex, "Error while retrieving students.","Unable to load students. Please try again.");
 
                 return View(new List<Student>());
             }
@@ -59,19 +57,11 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Database error while creating a student.");
-
-                TempData["ErrorMessage"] = "Unable to save the student. Please check the information and try again.";
-
-                return View(student);
+                return HandleFormError(student, ex,"Database error while creating a student.","Unable to save the student. Please check the information and try again.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while creating a student.");
-
-                TempData["ErrorMessage"] = "Something went wrong while creating the student.";
-
-                return View(student);
+                return HandleFormError(student, ex,"Error while creating a student.","Something went wrong while creating the student.");
             }
         }
 
@@ -91,11 +81,7 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while retrieving student with ID {StudentId}.", id);
-
-                TempData["ErrorMessage"] = "Unable to load the student. Please try again.";
-
-                return RedirectToAction("Index");
+                return HandleLoadError(ex, id);
             }
         }
 
@@ -128,19 +114,11 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Database error while updating student with ID {StudentId}.", id);
-
-                TempData["ErrorMessage"] = "Unable to update the student. Please try again.";
-
-                return View(student);
+                return HandleFormError(student, ex,$"Database error while updating student with ID {id}.","Unable to update the student. Please try again.");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while updating student with ID {StudentId}.", id);
-
-                TempData["ErrorMessage"] = "Something went wrong while updating the student.";
-
-                return View(student);
+                return HandleFormError(student, ex, $"Error while updating student with ID {id}.", "Something went wrong while updating the student.");
             }
         }
 
@@ -160,11 +138,7 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while retrieving student with ID {StudentId}.", id);
-
-                TempData["ErrorMessage"] = "Unable to load the student. Please try again.";
-
-                return RedirectToAction("Index");
+                return HandleLoadError(ex, id);
             }
         }
 
@@ -187,20 +161,36 @@ namespace Student_Housing_Management_System.Controllers
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "Database error while deleting student with ID {StudentId}.", id);
-
-                TempData["ErrorMessage"] = "Unable to delete this student because they may have related applications.";
+                SetErrorMessage(ex, $"Database error while deleting student with ID {id}.","Unable to delete this student because they may have related applications.");
 
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while deleting student with ID {StudentId}.", id);
-
-                TempData["ErrorMessage"] = "Something went wrong while deleting the student.";
+                SetErrorMessage(ex,$"Error while deleting student with ID {id}.", "Something went wrong while deleting the student.");
 
                 return RedirectToAction("Index");
             }
+        }
+
+        private void SetErrorMessage(Exception ex, string logMessage, string userMessage)
+        {
+            _logger.LogError(ex, logMessage);
+            TempData["ErrorMessage"] = userMessage;
+        }
+
+        private IActionResult HandleLoadError(Exception ex, int id)
+        {
+            SetErrorMessage(ex,$"Error while retrieving student with ID {id}.","Unable to load the student. Please try again.");
+
+            return RedirectToAction("Index");
+        }
+
+        private IActionResult HandleFormError(Student student,Exception ex,string logMessage,string userMessage)
+        {
+            SetErrorMessage(ex, logMessage, userMessage);
+
+            return View(student);
         }
     }
 }
