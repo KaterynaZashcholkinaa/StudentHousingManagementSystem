@@ -1,0 +1,88 @@
+﻿@model Student_Housing_Management_System.Models.Building
+
+@{
+    ViewData["Title"] = "Building Details";
+}
+
+<h1>@Model.Name</h1>
+
+<p><strong>Address:</strong> @Model.Address</p>
+
+<a asp-action="Edit"
+   asp-route-id="@Model.BuildingId"
+   class="btn btn-warning">
+    Edit Building
+</a>
+
+<a asp-action="Delete"
+   asp-route-id="@Model.BuildingId"
+   class="btn btn-danger">
+    Delete Building
+</a>
+
+<hr />
+
+<h2>Rooms</h2>
+
+<a asp-controller="Room"
+   asp-action="Create"
+   asp-route-buildingId="@Model.BuildingId"
+   class="btn btn-primary mb-3">
+    Add Room
+</a>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+@if (Model.Rooms.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Room Number</th>
+                <th>Floor</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var room in Model.Rooms)
+            {
+                <tr>
+                    <td>@room.RoomNumber</td>
+                    <td>@room.Floor</td>
+                    <td>@room.Price</td>
+                    <td>@room.RoomStatus</td>
+                    <td>
+                        <a asp-controller="Room"
+                           asp-action="Edit"
+                           asp-route-id="@room.RoomId"
+                           class="btn btn-warning">
+                            Edit
+                        </a>
+
+                        <a asp-controller="Room"
+                           asp-action="Delete"
+                           asp-route-id="@room.RoomId"
+                           class="btn btn-danger">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No rooms have been added to this building yet.</p>
+}
+
+<a asp-action="Index" class="btn btn-secondary">
+    Back to Buildings
+</a>

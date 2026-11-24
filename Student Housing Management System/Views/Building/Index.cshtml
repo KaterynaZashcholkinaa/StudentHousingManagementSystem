@@ -1,0 +1,39 @@
+﻿@model List<Student_Housing_Management_System.Models.Building>
+
+@{
+    ViewData["Title"] = "Buildings";
+}
+
+<h1>Buildings</h1>
+
+<a asp-action="Create" class="btn btn-primary mb-3">
+    Add Building
+</a>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Rooms</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var building in Model)
+        {
+            <tr>
+                <td>@building.Name</td>
+                <td>@building.Address</td>
+                <td>@building.Rooms.Count</td>
+                <td>
+                    <a asp-action="Details"
+                       asp-route-id="@building.BuildingId"
+                       class="btn btn-info">
+                        Details
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
