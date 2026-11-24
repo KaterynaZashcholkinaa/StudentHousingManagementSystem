@@ -1,4 +1,3 @@
-﻿
 using Student_Housing_Management_System.Data;
 using Student_Housing_Management_System.Models;
 
