@@ -20,7 +20,6 @@ namespace Student_Housing_Management_System
             
             builder.Services.AddScoped<StudentRepository>();
             builder.Services.AddScoped<ApplicationRepository>();
-            builder.Services.AddScoped<StudentRepository>();
             builder.Services.AddScoped<RoomRepository>();
             builder.Services.AddScoped<BuildingRepository>();
 
