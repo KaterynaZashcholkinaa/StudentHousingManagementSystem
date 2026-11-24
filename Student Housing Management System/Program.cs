@@ -25,7 +25,8 @@ namespace Student_Housing_Management_System
 
             builder.Services.AddScoped<StudentService>();
             builder.Services.AddScoped<ApplicationService>();
-
+            builder.Services.AddScoped<BuildingService>();
+            builder.Services.AddScoped<RoomService>();
 
 
             var app = builder.Build();
